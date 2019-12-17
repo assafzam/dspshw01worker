@@ -23,6 +23,10 @@ public class SQSHandler {
     }
 
 
+    public AmazonSQS getSqs() {
+        return sqs;
+    }
+
 
     String createQueue(String QueueNamePrefix) {
 
@@ -36,28 +40,6 @@ public class SQSHandler {
             e.printStackTrace();
         }
         return null;
-    }
-
-    void sendReviewToWorkers(String recordTitle, String reviewId, String reviewText, String queueUrl, String clientName){
-        System.out.println("Sending a message to a worker\n");
-
-        final Map<String, MessageAttributeValue> attributes = new HashMap<>();
-        attributes.put("clientName", new MessageAttributeValue()
-                .withDataType("String")
-                .withStringValue(clientName));
-        attributes.put("recordTitle", new MessageAttributeValue()
-                .withDataType("String")
-                .withStringListValues(recordTitle));
-        attributes.put("reviewId", new MessageAttributeValue()
-                .withDataType("String")
-                .withStringListValues(reviewId));
-
-
-        SendMessageRequest sendMessageRequest = new SendMessageRequest()
-                .withQueueUrl(queueUrl)
-                .withMessageBody(reviewText)
-                .withMessageAttributes(attributes);
-        sqs.sendMessage(sendMessageRequest);
     }
 
     void sendReviewToManager(String queueUrl, Map<String, MessageAttributeValue> attributes , String entities, int sentiment){
@@ -74,6 +56,28 @@ public class SQSHandler {
                 .withMessageAttributes(newAttributes);
         sqs.sendMessage(sendMessageRequest);
 
+    }
+
+    void sendReviewToWorkers(String recordTitle, String reviewId, String reviewText, String queueUrl, String clientName){
+        System.out.println("Sending a message to a worker\n");
+
+        final Map<String, MessageAttributeValue> attributes = new HashMap<>();
+        attributes.put("ClientName", new MessageAttributeValue()
+                .withDataType("String")
+                .withStringValue(clientName));
+        attributes.put("RecordTitle", new MessageAttributeValue()
+                .withDataType("String")
+                .withStringListValues(recordTitle));
+        attributes.put("ReviewId", new MessageAttributeValue()
+                .withDataType("String")
+                .withStringListValues(reviewId));
+
+
+        SendMessageRequest sendMessageRequest = new SendMessageRequest()
+                .withQueueUrl(queueUrl)
+                .withMessageBody(reviewText)
+                .withMessageAttributes(attributes);
+        sqs.sendMessage(sendMessageRequest);
     }
 
     void sendMessage(String message, String queueUrl) {
@@ -110,10 +114,10 @@ public class SQSHandler {
         while (true) {
             List<Message> messages = receiveMessages(urlQueue);
             for (Message message : messages) {
-                printMessage(message);
                 if (message.getBody().equals("terminate")) {
                     if (!message.getAttributes().containsKey("summary") || !message.getAttributes().get("summary").equals("done")) {
                         System.out.println("terminate message was received but without summary that is not done, now exiting");
+                        deleteMessageFromSqs(urlQueue, message);
 //                        System.exit(1);
                         return "";
                     } else
@@ -147,5 +151,22 @@ public class SQSHandler {
         final List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
         System.out.println();
         return messages;
+    }
+
+    public void waitForAliveMessageFromManger(String personalQueueUrl) {
+        while (true) {
+            List<Message> messages = receiveMessages(personalQueueUrl);
+            for (Message message : messages)
+                if (message.getBody().equals("alive")){
+                    deleteMessageFromSqs(personalQueueUrl, message);
+                    return;
+                }
+        }
+    }
+
+    public void deleteMessageFromSqs(String queueUrl, Message message){
+        System.out.println("Deleting the message: " + message.getBody() + " from queue: " + queueUrl + ".\n");
+        final String messageReceiptHandle = message.getReceiptHandle();
+        sqs.deleteMessage(new DeleteMessageRequest(queueUrl, messageReceiptHandle));
     }
 }
