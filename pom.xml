@@ -25,7 +25,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.roufid.tutorials.dspshw01manager</mainClass>
+                            <mainClass>com.roufid.tutorials.dspshw01worker</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

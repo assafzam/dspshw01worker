@@ -24,6 +24,7 @@ public class Worker {
             final ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(workersQueueOut).withVisibilityTimeout(180).withMaxNumberOfMessages(10);
             final List<Message> messages = sqs.getSqs().receiveMessage(receiveMessageRequest).getMessages();
             for (Message message : messages) {
+                System.out.println("message: " + message.getBody());
                 if (message.getBody().equals("terminate")) {
                     System.out.println("worker received from manger terminate message. exiting...");
                     System.exit(0);
