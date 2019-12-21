@@ -43,11 +43,10 @@ public class SQSHandler {
     }
 
     void sendReviewToManager(String queueUrl, Map<String, MessageAttributeValue> attributes , String entities, int sentiment){
-        System.out.println("Sending a message to a manager\n");
         Map<String, MessageAttributeValue> newAttributes = attributes;
         newAttributes.put("sentiment", new MessageAttributeValue()
                 .withDataType("String")
-                .withStringListValues(String.valueOf(sentiment)));
+                .withStringValue(String.valueOf(sentiment)));
 
 
         SendMessageRequest sendMessageRequest = new SendMessageRequest()
