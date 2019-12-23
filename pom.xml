@@ -7,6 +7,9 @@
     <groupId>worker</groupId>
     <artifactId>worker</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <properties>
+        <stanford.corenlp.version>3.9.2</stanford.corenlp.version>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -59,7 +62,43 @@
             <version>1.11.693</version>
             <type>pom</type>
         </dependency>
+        <dependency>
+        <groupId>edu.stanford.nlp</groupId>
+        <artifactId>stanford-corenlp</artifactId>
+        <version>3.9.2</version>
+    </dependency>
+    <dependency>
+        <groupId>edu.stanford.nlp</groupId>
+        <artifactId>stanford-corenlp</artifactId>
+        <version>3.9.2</version>
+        <classifier>models</classifier>
+    </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.1</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+    <dependency>
+        <groupId>de.jollyday</groupId>
+        <artifactId>jollyday</artifactId>
+        <version>0.5.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.ejml</groupId>
+        <artifactId>core</artifactId>
+        <version>0.27</version>
+    </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-ec2</artifactId>

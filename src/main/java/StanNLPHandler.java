@@ -17,6 +17,7 @@ public class StanNLPHandler {
     public static int findSentiment(String review) {
         Properties props = new Properties();
         props.put("annotators", "tokenize, ssplit, parse, sentiment");
+        props.setProperty("ner.useSUTime", "false");
         StanfordCoreNLP sentimentPipeline =  new StanfordCoreNLP(props);
 
         int mainSentiment = 0;
@@ -43,6 +44,7 @@ public class StanNLPHandler {
     public static ArrayList<String> findEntities(String review){
         Properties props = new Properties();
         props.put("annotators", "tokenize , ssplit, pos, lemma, ner");
+        props.setProperty("ner.useSUTime", "false");
         StanfordCoreNLP NERPipeline =  new StanfordCoreNLP(props);
 
         // create an empty Annotation just with the given text

@@ -9,9 +9,6 @@ import java.util.Map;
 public class Worker {
 
 
-    private S3Handler s3 = new S3Handler();
-
-    private SQSHandler sqs = new SQSHandler();
 
     public static void main(String[] args) {
 
@@ -21,11 +18,12 @@ public class Worker {
 
 
         while (true) {
-            final ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(workersQueueOut).withVisibilityTimeout(180).withMaxNumberOfMessages(10);
+            final ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(workersQueueOut).withVisibilityTimeout(300).withMaxNumberOfMessages(10);
             final List<Message> messages = sqs.getSqs().receiveMessage(receiveMessageRequest.withMessageAttributeNames("ClientName", "RecordTitle", "ReviewId")).getMessages();
             for (Message message : messages) {
                 System.out.println("message: " + message.getBody());
                 if (message.getBody().equals("terminate")) {
+                    sqs.sendMessage("terminate",workersQueueOut);
                     System.out.println("worker received from manger terminate message. exiting...");
                     // send the manager that you finished:
                     sqs.sendMessage("worker terminated", workersQueueIn);
@@ -47,7 +45,6 @@ public class Worker {
                 sqs.deleteMessageFromSqs(workersQueueOut,message);
 
             }
-
 
         }
 
